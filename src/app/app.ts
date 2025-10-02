@@ -50,7 +50,7 @@ export class App implements AfterViewInit, OnDestroy {
     {
       id: 'doc-1',
       label: 'documento-1',
-      src: '/pdfs/file-example_PDF_1MB.pdf',
+      src: 'pdfs/file-example_PDF_1MB.pdf',
       pageButtons: [
         { label: 'Evidencia 1', page: 1, highlight: { top: 25, left: 10, width: 80, height: 18 } },
         { label: 'Evidencia 2', page: 4, highlight: { top: 49, left: 10, width: 80, height: 5 } },
