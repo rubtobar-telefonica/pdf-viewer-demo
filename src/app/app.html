@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-base-200 p-6">
   <div class="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-start">
     <div class="w-full rounded-box bg-base-100 shadow lg:w-3/4">
-      <div role="tablist" class="tabs tabs-lifted tabs-lg w-full">
+      <div role="tablist" class="tabs tabs-lift tabs-lg w-full">
         <ng-container *ngFor="let doc of documents">
           <input
             type="radio"
@@ -37,9 +37,9 @@
     </div>
     <div class="flex w-full max-w-sm flex-col gap-6 rounded-box bg-base-100 p-6 shadow lg:w-1/4">
       <div>
-        <h2 class="text-xl font-bold">Accesos rápidos</h2>
+        <h2 class="text-xl font-bold">Evidencias</h2>
         <p class="text-sm opacity-70">
-          Elige la sección que quieras visitar incluso de otros documentos.
+          Elige la evidencia para que se muestre en el documento.
         </p>
       </div>
       <div class="space-y-6">
@@ -52,7 +52,6 @@
               *ngFor="let button of doc.pageButtons"
               class="btn btn-sm"
               type="button"
-              [ngClass]="{ 'btn-primary': isActive(doc), 'btn-outline': !isActive(doc) }"
               (click)="goToPage(button.page, doc)"
             >
               {{ button.label }} (pág. {{ button.page }})

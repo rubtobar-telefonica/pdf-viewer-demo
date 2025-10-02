@@ -1,5 +1,5 @@
 import { Component, NgZone, type AfterViewInit, type OnDestroy } from '@angular/core';
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { NgxExtendedPdfViewerModule, type PagesLoadedEvent } from 'ngx-extended-pdf-viewer';
 
 type ZoomType = string | number;
@@ -16,11 +16,12 @@ interface PdfDocument {
   pageButtons: PdfPageButton[];
   currentPage: number;
   zoom: ZoomType;
+  pendingPage?: number;
 }
 
 @Component({
   selector: 'app-root',
-  imports: [NgClass, NgFor, NgIf, NgxExtendedPdfViewerModule],
+  imports: [NgFor, NgIf, NgxExtendedPdfViewerModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -32,9 +33,9 @@ export class App implements AfterViewInit, OnDestroy {
       src: '/pdfs/file-example_PDF_1MB.pdf',
       pageButtons: [
         { label: 'Evidencia 1', page: 1 },
-        { label: 'Evidencia 2', page: 2 },
-        { label: 'Evidencia 3', page: 3 },
-        { label: 'Evidencia 4', page: 4 }
+        { label: 'Evidencia 2', page: 4 },
+        { label: 'Evidencia 3', page: 15 },
+        { label: 'Evidencia 4', page: 25 }
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -42,13 +43,23 @@ export class App implements AfterViewInit, OnDestroy {
     {
       id: 'doc-2',
       label: 'documento-2',
-      src: 'pdfs/sample.pdf',
+      src: 'pdfs/sample-local-pdf.pdf',
       pageButtons: [
         { label: 'Evidencia 1', page: 1 },
-        { label: 'Evidencia 2', page: 3 },
-        { label: 'Evidencia 3', page: 5 },
-        { label: 'Evidencia 4', page: 13 },
-        { label: 'Evidencia 5', page: 26 }
+        { label: 'Evidencia 2', page: 2 },
+        { label: 'Evidencia 3', page: 3 },
+      ],
+      currentPage: 1,
+      zoom: 'page-fit',
+    },
+    {
+      id: 'doc-3',
+      label: 'documento-3',
+      src: 'pdfs/sample-2.pdf',
+      pageButtons: [
+        { label: 'Evidencia 1', page: 1 },
+        { label: 'Evidencia 2', page: 2 },
+        { label: 'Evidencia 3', page: 3 },
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -60,7 +71,7 @@ export class App implements AfterViewInit, OnDestroy {
   private removeKeydown?: () => void;
   private removeWheel?: () => void;
 
-  constructor(private readonly zone: NgZone) {}
+  constructor(private readonly zone: NgZone) { }
 
   protected selectDocument(doc: PdfDocument): void {
     if (this.activeDoc === doc) {
@@ -83,9 +94,6 @@ export class App implements AfterViewInit, OnDestroy {
   protected onPagesLoaded(event: PagesLoadedEvent | undefined, doc: PdfDocument): void {
     const app = (window as any).PDFViewerApplication;
     const scale: number = app?.pdfViewer?.currentScale ?? 1;
-    const percent = Math.round(scale * 100);
-
-    doc.zoom = percent;
   }
 
   protected isActive(doc: PdfDocument): boolean {
