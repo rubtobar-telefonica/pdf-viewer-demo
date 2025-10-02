@@ -9,7 +9,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly pdfSrc = '/pdfs/Bootstrap-vs-Material-Design-vs-Prime-vs-Tailwind.pdf';
+  protected readonly pdfSrc = '/pdfs/file-example_PDF_1MB.pdf';
   protected readonly pageButtons = [
     { label: 'Portada', page: 1 },
     { label: 'Comparativa UI', page: 5 },

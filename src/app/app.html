@@ -1,8 +1,8 @@
 <div class="min-h-screen bg-base-200">
-  <div class="mx-auto flex max-w-6xl flex-col gap-6 p-6 lg:flex-row">
-    <div class="w-full rounded-box bg-base-100 shadow lg:w-2/3">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6 p-6 lg:flex-row lg:items-start">
+    <div class="w-full rounded-box bg-base-100 shadow lg:w-3/4">
       <ngx-extended-pdf-viewer
-        class="h-[75vh]"
+        class="h-[85vh] lg:h-[calc(100vh-5rem)]"
         [src]="pdfSrc"
         [(page)]="selectedPage"
         [textLayer]="true"
@@ -10,7 +10,7 @@
         useBrowserLocale="true"
       ></ngx-extended-pdf-viewer>
     </div>
-    <div class="flex w-full max-w-sm flex-col gap-4 rounded-box bg-base-100 p-6 shadow lg:w-1/3">
+    <div class="flex w-full max-w-sm flex-col gap-4 rounded-box bg-base-100 p-6 shadow lg:w-1/4">
       <div>
         <h2 class="text-xl font-bold">Ir a página</h2>
         <p class="text-sm opacity-70">
