@@ -1,5 +1,4 @@
 import { Component, NgZone, type AfterViewInit, type OnDestroy } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
 import { NgxExtendedPdfViewerModule, type PagesLoadedEvent } from 'ngx-extended-pdf-viewer';
 
 type ZoomType = string | number;
@@ -21,7 +20,7 @@ interface PdfDocument {
 
 @Component({
   selector: 'app-root',
-  imports: [NgFor, NgIf, NgxExtendedPdfViewerModule],
+  imports: [NgxExtendedPdfViewerModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
