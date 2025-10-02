@@ -10,6 +10,13 @@ interface HighlightArea {
   height: number;
 }
 
+interface HighlightOverlay {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
+
 interface PdfPageButton {
   label: string;
   page: number;
@@ -29,6 +36,7 @@ interface PdfDocument {
   zoom: ZoomType;
   pendingPage?: number;
   currentHighlight?: PdfHighlight;
+  highlightOverlay?: HighlightOverlay;
 }
 
 @Component({
@@ -82,6 +90,8 @@ export class App implements AfterViewInit, OnDestroy {
 
   private removeKeydown?: () => void;
   private removeWheel?: () => void;
+  private removeViewerScroll?: () => void;
+  private removeResize?: () => void;
 
   constructor(private readonly zone: NgZone) { }
 
@@ -93,6 +103,9 @@ export class App implements AfterViewInit, OnDestroy {
     this.activeDoc = doc;
     doc.currentPage = doc.currentPage || 1;
     doc.zoom = 'page-fit';
+    if (doc.currentHighlight) {
+      this.scheduleHighlightUpdate(doc);
+    }
   }
 
   protected goToPage(page: number, doc: PdfDocument = this.activeDoc): void {
@@ -101,6 +114,8 @@ export class App implements AfterViewInit, OnDestroy {
     }
 
     doc.currentPage = page;
+    doc.currentHighlight = undefined;
+    doc.highlightOverlay = undefined;
   }
 
   protected goToEvidence(button: PdfPageButton, doc: PdfDocument = this.activeDoc): void {
@@ -112,12 +127,15 @@ export class App implements AfterViewInit, OnDestroy {
     targetDoc.currentHighlight = button.highlight
       ? { ...button.highlight, page: button.page }
       : undefined;
+    targetDoc.highlightOverlay = undefined;
     targetDoc.currentPage = button.page;
+    this.scheduleHighlightUpdate(targetDoc);
   }
 
   protected onPagesLoaded(event: PagesLoadedEvent | undefined, doc: PdfDocument): void {
-    const app = (window as any).PDFViewerApplication;
-    const scale: number = app?.pdfViewer?.currentScale ?? 1;
+    if (doc.currentHighlight) {
+      this.scheduleHighlightUpdate(doc);
+    }
   }
 
   protected isActive(doc: PdfDocument): boolean {
@@ -156,10 +174,93 @@ export class App implements AfterViewInit, OnDestroy {
       this.removeKeydown = () => window.removeEventListener('keydown', keydownHandler, { capture: true } as any);
       this.removeWheel = () => window.removeEventListener('wheel', wheelHandler, { capture: true } as any);
     });
+
+    this.attachViewerListeners();
   }
 
   ngOnDestroy(): void {
     this.removeKeydown?.();
     this.removeWheel?.();
+    this.removeViewerScroll?.();
+    this.removeResize?.();
+  }
+
+  private attachViewerListeners(attempt = 0): void {
+    const viewerContainer = document.getElementById('viewerContainer');
+    if (!viewerContainer) {
+      if (attempt < 10) {
+        setTimeout(() => this.attachViewerListeners(attempt + 1), 150);
+      }
+      return;
+    }
+
+    const onScroll = () => this.updateAllHighlights();
+    viewerContainer.addEventListener('scroll', onScroll, { passive: true });
+    this.removeViewerScroll = () => viewerContainer.removeEventListener('scroll', onScroll);
+
+    const onResize = () => this.updateAllHighlights();
+    window.addEventListener('resize', onResize, { passive: true });
+    this.removeResize = () => window.removeEventListener('resize', onResize);
+  }
+
+  private updateAllHighlights(): void {
+    this.zone.runOutsideAngular(() => {
+      for (const doc of this.documents) {
+        if (doc.currentHighlight) {
+          this.updateHighlightPosition(doc);
+        }
+      }
+    });
+  }
+
+  private scheduleHighlightUpdate(doc: PdfDocument): void {
+    this.zone.runOutsideAngular(() => {
+      requestAnimationFrame(() => this.updateHighlightPosition(doc));
+      setTimeout(() => this.updateHighlightPosition(doc), 200);
+    });
+  }
+
+  private updateHighlightPosition(doc: PdfDocument): void {
+    const highlight = doc.currentHighlight;
+    if (!highlight) {
+      this.zone.run(() => {
+        doc.highlightOverlay = undefined;
+      });
+      return;
+    }
+
+    const container = document.querySelector<HTMLElement>(`[data-doc-id="${doc.id}"]`);
+    if (!container) {
+      return;
+    }
+
+    const viewerContainer = document.getElementById('viewerContainer');
+    const pageSelector = `.page[data-page-number="${highlight.page}"]`;
+    const pageElement = viewerContainer?.querySelector<HTMLElement>(pageSelector);
+
+    if (!pageElement) {
+      return;
+    }
+
+    const pageRect = pageElement.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (!pageRect.width || !pageRect.height) {
+      return;
+    }
+
+    const topPx = pageRect.top - containerRect.top + (highlight.top / 100) * pageRect.height;
+    const leftPx = pageRect.left - containerRect.left + (highlight.left / 100) * pageRect.width;
+    const widthPx = (highlight.width / 100) * pageRect.width;
+    const heightPx = (highlight.height / 100) * pageRect.height;
+
+    this.zone.run(() => {
+      doc.highlightOverlay = {
+        top: topPx,
+        left: leftPx,
+        width: widthPx,
+        height: heightPx
+      };
+    });
   }
 }
