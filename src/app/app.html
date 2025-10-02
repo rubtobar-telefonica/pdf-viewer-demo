@@ -9,7 +9,8 @@
         [showSidebarButton]="false"
         [showToolbar]="true"
         [theme]="'dark'"
-        [zoom]="'page-fit'"
+        [zoom]="zoom"
+        (zoomChange)="onZoomChange($event)"
         useBrowserLocale="true"
       ></ngx-extended-pdf-viewer>
     </div>

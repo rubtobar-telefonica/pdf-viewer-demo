@@ -17,10 +17,16 @@ export class App {
     { label: 'Conclusiones', page: 19 }
   ];
   protected selectedPage = 1;
-  protected zoomMode: string | number = 'page-fit';
+  zoom: string = 'page-fit';
 
   protected goToPage(page: number): void {
     this.selectedPage = page;
   }
 
+  onZoomChange(next: string | number): String {
+    if (next !== 'page-fit') {
+      this.zoom = 'page-fit';
+    }
+    return this.zoom;
+  }
 }
