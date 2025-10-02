@@ -17,8 +17,15 @@ export class App {
     { label: 'Conclusiones', page: 19 }
   ];
   protected selectedPage = 1;
+  protected zoomMode: string | number = 'page-fit';
 
   protected goToPage(page: number): void {
     this.selectedPage = page;
+  }
+
+  protected keepZoomLocked(newZoom: string | number): void {
+    if (newZoom !== 'page-fit') {
+      this.zoomMode = 'page-fit';
+    }
   }
 }

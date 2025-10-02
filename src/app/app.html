@@ -6,7 +6,10 @@
         [src]="pdfSrc"
         [(page)]="selectedPage"
         [textLayer]="true"
-        [showSidebarButton]="true"
+        [showSidebarButton]="false"
+        [showToolbar]="false"
+        [theme]="'dark'"
+        [zoom]="zoomMode"
         useBrowserLocale="true"
       ></ngx-extended-pdf-viewer>
     </div>
