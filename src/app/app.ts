@@ -27,28 +27,28 @@ interface PdfDocument {
 export class App implements AfterViewInit, OnDestroy {
   protected readonly documents: PdfDocument[] = [
     {
-      id: 'file-example',
-      label: 'Documento 1',
+      id: 'doc-1',
+      label: 'documento-1',
       src: '/pdfs/file-example_PDF_1MB.pdf',
       pageButtons: [
-        { label: 'Introducción', page: 1 },
-        { label: 'Informe', page: 2 },
-        { label: 'Datos', page: 3 },
-        { label: 'Anexos', page: 4 }
+        { label: 'Evidencia 1', page: 1 },
+        { label: 'Evidencia 2', page: 2 },
+        { label: 'Evidencia 3', page: 3 },
+        { label: 'Evidencia 4', page: 4 }
       ],
       currentPage: 1,
       zoom: 'page-fit',
     },
     {
-      id: 'comparativa-ui',
-      label: 'Comparativa UI',
+      id: 'doc-2',
+      label: 'documento-2',
       src: 'pdfs/sample.pdf',
       pageButtons: [
-        { label: 'Portada', page: 1 },
-        { label: 'Resumen', page: 3 },
-        { label: 'Comparativa UI', page: 5 },
-        { label: 'Angular + Bootstrap', page: 13 },
-        { label: 'Conclusiones', page: 26 }
+        { label: 'Evidencia 1', page: 1 },
+        { label: 'Evidencia 2', page: 3 },
+        { label: 'Evidencia 3', page: 5 },
+        { label: 'Evidencia 4', page: 13 },
+        { label: 'Evidencia 5', page: 26 }
       ],
       currentPage: 1,
       zoom: 'page-fit',
