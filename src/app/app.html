@@ -1,35 +1,64 @@
-<div class="min-h-screen bg-base-200">
-  <div class="mx-auto flex max-w-6xl flex-col gap-6 p-6 lg:flex-row lg:items-start">
+<div class="min-h-screen bg-base-200 p-6">
+  <div class="mx-auto flex max-w-6xl flex-col gap-6 lg:flex-row lg:items-start">
     <div class="w-full rounded-box bg-base-100 shadow lg:w-3/4">
-      <ngx-extended-pdf-viewer
-        class="h-[85vh] lg:h-[calc(100vh-5rem)]"
-        [src]="pdfSrc"
-        [(page)]="selectedPage"
-        [textLayer]="true"
-        [showSidebarButton]="false"
-        [showToolbar]="false"
-        [theme]="'dark'"
-        [zoom]="zoom"
-        (zoomChange)="onZoomChange($event)"
-        useBrowserLocale="true"
-      ></ngx-extended-pdf-viewer>
+      <div role="tablist" class="tabs tabs-lifted tabs-lg w-full">
+        <ng-container *ngFor="let doc of documents">
+          <input
+            type="radio"
+            name="pdf-tabs"
+            role="tab"
+            class="tab"
+            [attr.aria-label]="doc.label"
+            [checked]="isActive(doc)"
+            (change)="selectDocument(doc)"
+          />
+          <div
+            role="tabpanel"
+            class="tab-content rounded-box rounded-t-none border-base-300 bg-base-100"
+            [class.hidden]="!isActive(doc)"
+          >
+            <ng-container *ngIf="isActive(doc)">
+              <ngx-extended-pdf-viewer
+                class="h-[85vh] lg:h-[calc(100vh-5rem)]"
+                [height]="'100vh'"
+                [src]="doc.src"
+                [(page)]="doc.currentPage"
+                [textLayer]="true"
+                [showSidebarButton]="false"
+                [showToolbar]="false"
+                [zoom]="doc.zoom"
+                (pagesLoaded)="onPagesLoaded($event, doc)"
+                useBrowserLocale="true"
+              ></ngx-extended-pdf-viewer>
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
     </div>
-    <div class="flex w-full max-w-sm flex-col gap-4 rounded-box bg-base-100 p-6 shadow lg:w-1/4">
+    <div class="flex w-full max-w-sm flex-col gap-6 rounded-box bg-base-100 p-6 shadow lg:w-1/4">
       <div>
-        <h2 class="text-xl font-bold">Ir a página</h2>
+        <h2 class="text-xl font-bold">Accesos rápidos</h2>
         <p class="text-sm opacity-70">
-          Selecciona la sección para saltar directamente en el documento.
+          Elige la sección que quieras visitar incluso de otros documentos.
         </p>
       </div>
-      <div class="flex flex-col gap-3">
-        <button
-          *ngFor="let button of pageButtons"
-          class="btn btn-primary"
-          type="button"
-          (click)="goToPage(button.page)"
-        >
-          {{ button.label }} (pág. {{ button.page }})
-        </button>
+      <div class="space-y-6">
+        <div *ngFor="let doc of documents" class="space-y-3">
+          <h3 class="text-base font-semibold" [class.text-primary]="isActive(doc)">
+            {{ doc.label }}
+          </h3>
+          <div class="flex flex-col gap-2">
+            <button
+              *ngFor="let button of doc.pageButtons"
+              class="btn btn-sm"
+              type="button"
+              [ngClass]="{ 'btn-primary': isActive(doc), 'btn-outline': !isActive(doc) }"
+              (click)="goToPage(button.page, doc)"
+            >
+              {{ button.label }} (pág. {{ button.page }})
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
