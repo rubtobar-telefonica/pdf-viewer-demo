@@ -1,12 +1,24 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { NgFor } from '@angular/common';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [NgFor, NgxExtendedPdfViewerModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('pdf-viewer-demo');
+  protected readonly pdfSrc = '/pdfs/Bootstrap-vs-Material-Design-vs-Prime-vs-Tailwind.pdf';
+  protected readonly pageButtons = [
+    { label: 'Portada', page: 1 },
+    { label: 'Comparativa UI', page: 5 },
+    { label: 'Angular + Bootstrap', page: 13 },
+    { label: 'Conclusiones', page: 19 }
+  ];
+  protected selectedPage = 1;
+
+  protected goToPage(page: number): void {
+    this.selectedPage = page;
+  }
 }
