@@ -11,10 +11,10 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 export class App {
   protected readonly pdfSrc = '/pdfs/file-example_PDF_1MB.pdf';
   protected readonly pageButtons = [
-    { label: 'Portada', page: 1 },
-    { label: 'Comparativa UI', page: 5 },
-    { label: 'Angular + Bootstrap', page: 13 },
-    { label: 'Conclusiones', page: 19 }
+    { label: 'Evidencia 1', page: 1  },
+    { label: 'Evidencia 2', page: 5  },
+    { label: 'evidencia 3', page: 13 },
+    { label: 'evidencia 4', page: 19 },
   ];
   protected selectedPage = 1;
   zoom: string = 'page-fit';
