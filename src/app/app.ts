@@ -52,10 +52,10 @@ export class App implements AfterViewInit, OnDestroy {
       label: 'documento-1',
       src: '/pdfs/file-example_PDF_1MB.pdf',
       pageButtons: [
-        { label: 'Evidencia 1', page: 1, highlight: { top: 20, left: 12, width: 30, height: 18 } },
-        { label: 'Evidencia 2', page: 4, highlight: { top: 45, left: 10, width: 50, height: 22 } },
-        { label: 'Evidencia 3', page: 15, highlight: { top: 28, left: 40, width: 35, height: 20 } },
-        { label: 'Evidencia 4', page: 25, highlight: { top: 60, left: 25, width: 40, height: 24 } }
+        { label: 'Evidencia 1', page: 1, highlight: { top: 25, left: 10, width: 80, height: 18 } },
+        { label: 'Evidencia 2', page: 4, highlight: { top: 49, left: 10, width: 80, height: 5 } },
+        { label: 'Evidencia 3', page: 15, highlight: { top: 50, left: 10, width: 80, height: 20 } },
+        { label: 'Evidencia 4', page: 25, highlight: { top: 50, left: 10, width: 80, height: 20 } }
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -65,9 +65,9 @@ export class App implements AfterViewInit, OnDestroy {
       label: 'documento-2',
       src: 'pdfs/sample-local-pdf.pdf',
       pageButtons: [
-        { label: 'Evidencia 1', page: 1, highlight: { top: 18, left: 18, width: 32, height: 16 } },
-        { label: 'Evidencia 2', page: 2, highlight: { top: 50, left: 22, width: 46, height: 18 } },
-        { label: 'Evidencia 3', page: 3, highlight: { top: 35, left: 30, width: 36, height: 20 } },
+        { label: 'Evidencia 1', page: 1, highlight: { top: 18, left: 5, width: 90, height: 14 } },
+        { label: 'Evidencia 2', page: 2, highlight: { top: 55, left: 5, width: 90, height: 10 } },
+        { label: 'Evidencia 3', page: 3, highlight: { top: 35, left: 5, width: 90, height: 9 } },
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -77,9 +77,9 @@ export class App implements AfterViewInit, OnDestroy {
       label: 'documento-3',
       src: 'pdfs/sample-2.pdf',
       pageButtons: [
-        { label: 'Evidencia 1', page: 1, highlight: { top: 25, left: 12, width: 40, height: 20 } },
-        { label: 'Evidencia 2', page: 2, highlight: { top: 42, left: 28, width: 38, height: 18 } },
-        { label: 'Evidencia 3', page: 3, highlight: { top: 60, left: 20, width: 45, height: 22 } },
+        { label: 'Evidencia 1', page: 1, highlight: { top: 30, left: 35, width: 30, height: 2 } },
+        { label: 'Evidencia 2', page: 2, highlight: { top: 69.5, left: 15, width: 70, height: 3 } },
+        { label: 'Evidencia 3', page: 3, highlight: { top: 23, left: 49, width: 26, height: 4 } },
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -136,12 +136,15 @@ export class App implements AfterViewInit, OnDestroy {
     if (doc.currentHighlight) {
       this.scheduleHighlightUpdate(doc);
     }
+    // Ensure scroll listeners are bound to the freshly created viewerContainer
+    this.attachViewerListeners(0, true);
   }
 
   protected isActive(doc: PdfDocument): boolean {
     return this.activeDoc === doc;
   }
 
+  // Eliminamos la posibilidad de hacer Zoom sobre el PDF, tanto con el mouse como con teclado.
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {
       const keydownHandler = (event: KeyboardEvent) => {
@@ -185,18 +188,25 @@ export class App implements AfterViewInit, OnDestroy {
     this.removeResize?.();
   }
 
-  private attachViewerListeners(attempt = 0): void {
+  private attachViewerListeners(attempt = 0, rebind = false): void {
     const viewerContainer = document.getElementById('viewerContainer');
     if (!viewerContainer) {
       if (attempt < 10) {
-        setTimeout(() => this.attachViewerListeners(attempt + 1), 150);
+        setTimeout(() => this.attachViewerListeners(attempt + 1, rebind), 150);
       }
       return;
     }
 
-    const onScroll = () => this.updateAllHighlights();
-    viewerContainer.addEventListener('scroll', onScroll, { passive: true });
-    this.removeViewerScroll = () => viewerContainer.removeEventListener('scroll', onScroll);
+    if (rebind) {
+      this.removeViewerScroll?.();
+      this.removeViewerScroll = undefined;
+    }
+
+    if (!this.removeViewerScroll) {
+      const onScroll = () => this.updateAllHighlights();
+      viewerContainer.addEventListener('scroll', onScroll, { passive: true });
+      this.removeViewerScroll = () => viewerContainer.removeEventListener('scroll', onScroll);
+    }
 
     const onResize = () => this.updateAllHighlights();
     window.addEventListener('resize', onResize, { passive: true });
