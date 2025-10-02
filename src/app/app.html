@@ -18,17 +18,29 @@
             [class.hidden]="!isActive(doc)"
           >
             @if (isActive(doc)) {
-              <ngx-extended-pdf-viewer
-                class="h-[calc(100vh-12rem)] lg:h-[calc(100vh-10rem)]"
-                [src]="doc.src"
-                [(page)]="doc.currentPage"
-                [textLayer]="true"
-                [showSidebarButton]="false"
-                [showToolbar]="false"
-                [zoom]="doc.zoom"
-                (pagesLoaded)="onPagesLoaded($event, doc)"
-                useBrowserLocale="true"
-              ></ngx-extended-pdf-viewer>
+              <div class="relative h-[calc(100vh-12rem)] lg:h-[calc(100vh-10rem)]">
+                <ngx-extended-pdf-viewer
+                  class="h-full w-full"
+                  [src]="doc.src"
+                  [(page)]="doc.currentPage"
+                  [textLayer]="true"
+                  [showSidebarButton]="false"
+                  [showToolbar]="false"
+                  [zoom]="doc.zoom"
+                  (pagesLoaded)="onPagesLoaded($event, doc)"
+                  useBrowserLocale="true"
+                ></ngx-extended-pdf-viewer>
+                @if (doc.currentHighlight?.page === doc.currentPage) {
+                  <div
+                    class="pointer-events-none absolute left-0 top-0 z-20 rounded-lg border-2 border-warning bg-warning"
+                    [style.opacity]="0.25"
+                    [style.top.%]="doc.currentHighlight!.top"
+                    [style.left.%]="doc.currentHighlight!.left"
+                    [style.width.%]="doc.currentHighlight!.width"
+                    [style.height.%]="doc.currentHighlight!.height"
+                  ></div>
+                }
+              </div>
             }
           </div>
         }
@@ -49,7 +61,7 @@
             </h3>
             <div class="flex flex-col gap-2">
               @for (button of doc.pageButtons; track button.page) {
-                <button class="btn btn-sm" type="button" (click)="goToPage(button.page, doc)">
+                <button class="btn btn-sm" type="button" (click)="goToEvidence(button, doc)">
                   {{ button.label }} (pág. {{ button.page }})
                 </button>
               }

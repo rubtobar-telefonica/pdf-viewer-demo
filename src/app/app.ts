@@ -3,8 +3,20 @@ import { NgxExtendedPdfViewerModule, type PagesLoadedEvent } from 'ngx-extended-
 
 type ZoomType = string | number;
 
+interface HighlightArea {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
+
 interface PdfPageButton {
   label: string;
+  page: number;
+  highlight?: HighlightArea;
+}
+
+interface PdfHighlight extends HighlightArea {
   page: number;
 }
 
@@ -16,6 +28,7 @@ interface PdfDocument {
   currentPage: number;
   zoom: ZoomType;
   pendingPage?: number;
+  currentHighlight?: PdfHighlight;
 }
 
 @Component({
@@ -31,10 +44,10 @@ export class App implements AfterViewInit, OnDestroy {
       label: 'documento-1',
       src: '/pdfs/file-example_PDF_1MB.pdf',
       pageButtons: [
-        { label: 'Evidencia 1', page: 1 },
-        { label: 'Evidencia 2', page: 4 },
-        { label: 'Evidencia 3', page: 15 },
-        { label: 'Evidencia 4', page: 25 }
+        { label: 'Evidencia 1', page: 1, highlight: { top: 20, left: 12, width: 30, height: 18 } },
+        { label: 'Evidencia 2', page: 4, highlight: { top: 45, left: 10, width: 50, height: 22 } },
+        { label: 'Evidencia 3', page: 15, highlight: { top: 28, left: 40, width: 35, height: 20 } },
+        { label: 'Evidencia 4', page: 25, highlight: { top: 60, left: 25, width: 40, height: 24 } }
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -44,9 +57,9 @@ export class App implements AfterViewInit, OnDestroy {
       label: 'documento-2',
       src: 'pdfs/sample-local-pdf.pdf',
       pageButtons: [
-        { label: 'Evidencia 1', page: 1 },
-        { label: 'Evidencia 2', page: 2 },
-        { label: 'Evidencia 3', page: 3 },
+        { label: 'Evidencia 1', page: 1, highlight: { top: 18, left: 18, width: 32, height: 16 } },
+        { label: 'Evidencia 2', page: 2, highlight: { top: 50, left: 22, width: 46, height: 18 } },
+        { label: 'Evidencia 3', page: 3, highlight: { top: 35, left: 30, width: 36, height: 20 } },
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -56,9 +69,9 @@ export class App implements AfterViewInit, OnDestroy {
       label: 'documento-3',
       src: 'pdfs/sample-2.pdf',
       pageButtons: [
-        { label: 'Evidencia 1', page: 1 },
-        { label: 'Evidencia 2', page: 2 },
-        { label: 'Evidencia 3', page: 3 },
+        { label: 'Evidencia 1', page: 1, highlight: { top: 25, left: 12, width: 40, height: 20 } },
+        { label: 'Evidencia 2', page: 2, highlight: { top: 42, left: 28, width: 38, height: 18 } },
+        { label: 'Evidencia 3', page: 3, highlight: { top: 60, left: 20, width: 45, height: 22 } },
       ],
       currentPage: 1,
       zoom: 'page-fit',
@@ -88,6 +101,18 @@ export class App implements AfterViewInit, OnDestroy {
     }
 
     doc.currentPage = page;
+  }
+
+  protected goToEvidence(button: PdfPageButton, doc: PdfDocument = this.activeDoc): void {
+    const targetDoc = doc;
+    if (this.activeDoc !== targetDoc) {
+      this.selectDocument(targetDoc);
+    }
+
+    targetDoc.currentHighlight = button.highlight
+      ? { ...button.highlight, page: button.page }
+      : undefined;
+    targetDoc.currentPage = button.page;
   }
 
   protected onPagesLoaded(event: PagesLoadedEvent | undefined, doc: PdfDocument): void {
