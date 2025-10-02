@@ -23,9 +23,4 @@ export class App {
     this.selectedPage = page;
   }
 
-  protected keepZoomLocked(newZoom: string | number): void {
-    if (newZoom !== 'page-fit') {
-      this.zoomMode = 'page-fit';
-    }
-  }
 }
